@@ -6,6 +6,7 @@ import clsx from 'clsx'
 export default function SleepTimeCalculator() {
     const [location, setLocation] = useState('')
     const [sleepTime, setSleepTime] = useState('')
+    const [sunriseTime, setSunriseTime] = useState('')
     const [error, setError] = useState('')
 
     useEffect(() => {
@@ -22,8 +23,12 @@ export default function SleepTimeCalculator() {
                 const sunriseData = await sunriseRes.json()
                 if (!sunriseRes.ok) throw new Error(sunriseData.error || 'Failed to fetch sunrise time')
 
-                const sunriseDate = new Date(sunriseData.sunrise).getTime()
-                const wakeupDate = new Date(sunriseDate - 15 * 60 * 1000) // 15 minutes before sunrise
+                const sunriseDate = new Date(sunriseData.sunrise)
+                setSunriseTime(
+                    sunriseDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+                )
+
+                const wakeupDate = new Date(sunriseDate.getTime() - 15 * 60 * 1000) // 15 minutes before sunrise
                 const sleepDate = new Date(wakeupDate.getTime() - 8 * 60 * 60 * 1000) // 8 hours of sleep
 
                 setSleepTime(sleepDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }))
@@ -52,6 +57,8 @@ export default function SleepTimeCalculator() {
                         >
                             {sleepTime || '...'}
                         </h1>
+                        {sunriseTime && <p className='text-xs text-gray-500'>Sunrise: {sunriseTime}</p>}
+
                         <div
                             className={clsx(
                                 'flex items-center text-lg gap-2 opacity-0 transition-opacity duration-1000',

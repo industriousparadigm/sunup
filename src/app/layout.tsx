@@ -15,7 +15,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-    title: 'Sleep Time App',
+    title: 'Sunup',
     description: 'Calculate your ideal bedtime.'
 }
 

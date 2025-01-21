@@ -1,0 +1,21 @@
+{
+    "name": "Sleep time calculator",
+    "short_name": "Sunup",
+    "icons": [
+      {
+        "src": "/sunrise-android.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "/sunrise-ios.png",
+        "type": "image/png",
+        "sizes": "180x180"
+      }
+    ],
+    "start_url": "/",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "theme_color": "#ffffff"
+  }
+  
