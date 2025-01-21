@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
         console.log(`Cache miss for IP: ${userIp}. Fetching from IPinfo API.`)
 
         // Fetch location data from IPinfo
-        const apiUrl = `https://ipinfo.io/${userIp}?token=<YOUR_API_TOKEN>`
+        const apiUrl = `https://ipinfo.io/${userIp}?token=aa8fd5d8f657aa`
         console.log(`Fetching location data from: ${apiUrl}`)
         const locationRes = await fetch(apiUrl)
 
