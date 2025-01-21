@@ -9,7 +9,21 @@ export async function GET(req: NextRequest) {
             req.headers.get("x-forwarded-for")?.split(",")[0] || // Extract first IP from x-forwarded-for
             req.headers.get("x-real-ip") || // Fallback for x-real-ip
             "127.0.0.1" // Default for local testing
+
         console.log(`Detected IP: ${userIp}`)
+
+        // Handle local or bogon IPs
+        if (userIp === "::1" || userIp === "127.0.0.1") {
+            console.log("Using mock data for localhost or loopback IP.")
+            return new Response(
+                JSON.stringify({
+                    location: "Maragogi, Brazil",
+                    lat: -8.98323158618796,
+                    lng: -35.18994999999999,
+                }),
+                { status: 200 }
+            )
+        }
 
         // Check cache for the IP
         if (cache.has(userIp)) {
@@ -17,10 +31,10 @@ export async function GET(req: NextRequest) {
             return new Response(JSON.stringify(cache.get(userIp)), { status: 200 })
         }
 
-        console.log(`Cache miss for IP: ${userIp}. Fetching from API.`)
+        console.log(`Cache miss for IP: ${userIp}. Fetching from IPinfo API.`)
 
-        // Step 2: Use ipapi.co to get location details
-        const apiUrl = `https://ipapi.co/${userIp}/json/`
+        // Fetch location data from IPinfo
+        const apiUrl = `https://ipinfo.io/${userIp}?token=<YOUR_API_TOKEN>`
         console.log(`Fetching location data from: ${apiUrl}`)
         const locationRes = await fetch(apiUrl)
 
@@ -37,12 +51,22 @@ export async function GET(req: NextRequest) {
         const locationData = await locationRes.json()
         console.log(`Location data retrieved:`, locationData)
 
-        // Step 3: Format and cache location data
-        const locationName = `${locationData.city}, ${locationData.country_name}`
+        // Handle missing or invalid location data
+        if (!locationData.loc) {
+            console.error("Location data is invalid or incomplete.")
+            return new Response(
+                JSON.stringify({ error: "Invalid location data received from API." }),
+                { status: 500 }
+            )
+        }
+
+        // Extract location details
+        const [latitude, longitude] = locationData.loc.split(",")
+        const locationName = `${locationData.city}, ${locationData.country}`
         const cachedData = {
             location: locationName,
-            lat: locationData.latitude,
-            lng: locationData.longitude,
+            lat: parseFloat(latitude),
+            lng: parseFloat(longitude),
         }
 
         // Cache the result for 24 hours
