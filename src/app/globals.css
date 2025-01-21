@@ -5,6 +5,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-primary: var(--font-playfair-display);
+  --font-secondary: var(--font-inter);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,5 +19,14 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-secondary), Arial, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-primary), serif;
 }
