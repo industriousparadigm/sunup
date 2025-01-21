@@ -1,18 +1,12 @@
-export async function GET() {
+import { NextRequest } from "next/server"
+
+export async function GET(req: NextRequest) {
     try {
-        // Step 1: Fetch user's IP using ipify.org
-        console.log("Fetching user IP...")
-        const ipRes = await fetch("https://api.ipify.org?format=json")
-        if (!ipRes.ok) {
-            console.error(`Failed to fetch client IP: ${ipRes.statusText}`)
-            return new Response(
-                JSON.stringify({ error: "Unable to determine client IP." }),
-                { status: 500 }
-            )
-        }
-        const ipData = await ipRes.json()
-        const userIp = ipData.ip
-        console.log(`User IP fetched: ${userIp}`)
+        const userIp =
+            req.headers.get("x-forwarded-for")?.split(",")[0] || // Extract first IP from x-forwarded-for
+            req.headers.get("x-real-ip") || // Fallback for x-real-ip
+            "127.0.0.1" // Default for local testing
+        console.log(`Detected IP: ${userIp}`)
 
         // Step 2: Use ipapi.co to get location details
         const apiUrl = `https://ipapi.co/${userIp}/json/`
