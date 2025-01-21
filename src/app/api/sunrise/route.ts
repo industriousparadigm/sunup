@@ -1,4 +1,6 @@
-export async function GET(req) {
+import { NextRequest } from "next/server"
+
+export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const lat = searchParams.get('lat')
     const lng = searchParams.get('lng')
@@ -11,7 +13,7 @@ export async function GET(req) {
       if (!response.ok || data.status !== 'OK') throw new Error('Failed to fetch sunrise data')
   
       return new Response(JSON.stringify({ sunrise: data.results.sunrise }), { status: 200 })
-    } catch (error) {
+    } catch (error: any) {
       return new Response(JSON.stringify({ error: error.message }), { status: 500 })
     }
   }

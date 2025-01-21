@@ -1,6 +1,8 @@
+import { NextRequest } from "next/server"
+
 const cache = new Map()
 
-export async function GET(req) {
+export async function GET(req: NextRequest) {
     try {
         // Extract IP address (handle headers correctly)
         const ip =
@@ -55,7 +57,7 @@ export async function GET(req) {
         }, 24 * 60 * 60 * 1000) // Remove after 24 hours
 
         return new Response(JSON.stringify({ location: locationName, lat: data.latitude, lng: data.longitude }), { status: 200 })
-    } catch (error) {
+    } catch (error: any) {
         console.error(`Error processing request: ${error.message}`, error)
         return new Response(JSON.stringify({ error: error.message || 'Service unavailable' }), { status: 500 })
     }

@@ -22,10 +22,12 @@ export default function SleepTimeCalculator() {
                 const sunriseData = await sunriseRes.json()
                 if (!sunriseRes.ok) throw new Error(sunriseData.error || 'Failed to fetch sunrise time')
 
-                const sunriseDate = new Date(sunriseData.sunrise)
-                const sleepDate = new Date(sunriseDate - 8.25 * 60 * 60 * 1000) // 8 hours + 15 minutes before sunrise
-                setSleepTime(sleepDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))
-            } catch (err) {
+                const sunriseDate = new Date(sunriseData.sunrise).getTime()
+                const wakeupDate = new Date(sunriseDate - 15 * 60 * 1000) // 15 minutes before sunrise
+                const sleepDate = new Date(wakeupDate.getTime() - 8 * 60 * 60 * 1000) // 8 hours of sleep
+
+                setSleepTime(sleepDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }))
+            } catch (err: any) {
                 setError(err.message)
             }
         }
@@ -34,12 +36,13 @@ export default function SleepTimeCalculator() {
     }, [])
 
     return (
-        <div className='min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-200 via-yellow-100 to-white text-gray-900 p-6'>
+        <div className='min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-indigo-300 via-pink-200 to-orange-100 text-gray-900 p-6'>
             {error ? (
                 <p className='text-red-600 text-lg'>Error: {error}</p>
             ) : (
                 <>
                     <div className='flex flex-col items-center gap-2 animate-fade-in'>
+                        <p className='text-sm text-gray-600'>Bedtime</p>
                         <h1
                             className={clsx('text-6xl font-bold mb-4 opacity-0 transition-opacity duration-1000', {
                                 'opacity-100': sleepTime
