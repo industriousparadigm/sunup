@@ -57,8 +57,14 @@ export default function SleepTimeCalculator() {
                         >
                             {sleepTime || '...'}
                         </h1>
-                        {sunriseTime && <p className='text-xs text-gray-500'>Sunrise: {sunriseTime}</p>}
-
+                        <p
+                            className={clsx('text-xs text-gray-500 opacity-0 transition-opacity duration-1000', {
+                                'opacity-100': sunriseTime
+                            })}
+                            style={{ minHeight: '16px' }} // Reserve space for sunrise text
+                        >
+                            {sunriseTime ? `Sunrise: ${sunriseTime}` : ''}
+                        </p>
                         <div
                             className={clsx(
                                 'flex items-center text-lg gap-2 opacity-0 transition-opacity duration-1000',
