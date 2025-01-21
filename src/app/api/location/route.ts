@@ -1,43 +1,40 @@
 import { NextRequest } from "next/server"
 
-const cache = new Map()
-
 export async function GET(req: NextRequest) {
     try {
-        const userIp =
-            req.headers.get("x-forwarded-for")?.split(",")[0] ||
-            req.headers.get("x-real-ip") ||
-            "127.0.0.1" // Default to localhost
-
-        if (userIp === "127.0.0.1" || userIp === "::1") {
-            console.error("Using mock data for localhost")
+        // Extract IP address from query parameters (passed from client-side)
+        const userIp = req.nextUrl.searchParams.get("ip")
+        if (!userIp) {
+            console.error("Missing IP address in query parameters.")
             return new Response(
-                JSON.stringify({
-                    location: "Maragogi, Brazil",
-                    lat: -8.98323158618796,
-                    lng: -35.18994999999999,
-                }),
-                { status: 200 }
+                JSON.stringify({ error: "IP address is required." }),
+                { status: 400 }
             )
         }
 
-        if (cache.has(userIp)) {
-            return new Response(JSON.stringify(cache.get(userIp)), { status: 200 })
-        }
+        console.log(`Received IP: ${userIp}`) // Log IP for debugging
 
+        // Build API request to ipapi.co
         const apiUrl = `https://ipapi.co/${userIp}/json/`
+        console.log(`Fetching location data from: ${apiUrl}`)
+
         const response = await fetch(apiUrl)
 
         if (!response.ok) {
-            throw new Error(`API Error: ${response.status} - ${response.statusText}`)
+            console.error(`API Error: ${response.status} - ${response.statusText}`)
+            const errorBody = await response.text()
+            console.error(`API Error Body: ${errorBody}`)
+            return new Response(
+                JSON.stringify({ error: `External API error: ${response.statusText}` }),
+                { status: response.status }
+            )
         }
 
         const data = await response.json()
-        const locationName = `${data.city}, ${data.country_name}`
+        console.log(`Location data retrieved:`, data)
 
-        // Cache result for 24 hours
-        cache.set(userIp, { location: locationName, lat: data.latitude, lng: data.longitude })
-        setTimeout(() => cache.delete(userIp), 24 * 60 * 60 * 1000)
+        // Extract meaningful location data
+        const locationName = `${data.city}, ${data.country_name}`
 
         return new Response(
             JSON.stringify({ location: locationName, lat: data.latitude, lng: data.longitude }),
