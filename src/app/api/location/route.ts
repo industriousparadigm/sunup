@@ -57,7 +57,8 @@ export async function GET(req: NextRequest) {
         }, 24 * 60 * 60 * 1000) // Remove after 24 hours
 
         return new Response(JSON.stringify({ location: locationName, lat: data.latitude, lng: data.longitude }), { status: 200 })
-    } catch (error: any) {
+    } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error('An unexpected error occurred')
         console.error(`Error processing request: ${error.message}`, error)
         return new Response(JSON.stringify({ error: error.message || 'Service unavailable' }), { status: 500 })
     }

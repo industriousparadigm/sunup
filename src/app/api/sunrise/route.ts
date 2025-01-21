@@ -13,8 +13,9 @@ export async function GET(req: NextRequest) {
       if (!response.ok || data.status !== 'OK') throw new Error('Failed to fetch sunrise data')
   
       return new Response(JSON.stringify({ sunrise: data.results.sunrise }), { status: 200 })
-    } catch (error: any) {
-      return new Response(JSON.stringify({ error: error.message }), { status: 500 })
+    } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error('An unexpected error occurred')
+        return new Response(JSON.stringify({ error: error.message }), { status: 500 })
     }
   }
   

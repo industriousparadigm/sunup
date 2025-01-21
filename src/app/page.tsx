@@ -27,8 +27,9 @@ export default function SleepTimeCalculator() {
                 const sleepDate = new Date(wakeupDate.getTime() - 8 * 60 * 60 * 1000) // 8 hours of sleep
 
                 setSleepTime(sleepDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }))
-            } catch (err: any) {
-                setError(err.message)
+            } catch (err: unknown) {
+                const error = err instanceof Error ? err : new Error(String(err))
+                setError(error.message)
             }
         }
 
